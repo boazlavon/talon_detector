@@ -1,0 +1,79 @@
+{
+    "requests": [
+        {
+            "timestamp": "2021-11-12T19:12:14.505Z",
+            "url": "/login",
+            "host": "www.talon-sec.com",   
+            "content": "user=root&password=qwerty&tokenid=t1a2lo3n4",
+            "_comment": "will trigger weak password"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:16.505Z",
+            "url": "/login",
+            "host": "www.nottalon-sec.com",   
+            "content": "user=root&password=qwerty&tokenid=ancdefsdf324",
+            "_comment": "will trigger password-reuse within 10s"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:16.506Z",
+            "url": "/login",
+            "host": "www.talon-sec.com",   
+            "content": "password=no_user_only_pass"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:18.505Z",
+            "url": "/login",
+            "host": "www.talon-sec.com",   
+            "content": "user=root&password=AS22A!@#fVSECUREPASS&tokenid=t1a2lo3n4"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:19.879Z",
+            "url": "/login",
+            "host": "www.nottalon-sec.com",   
+            "content": "password=qwerty&tokenid=aaaa1111&user=root",
+            "_comment": "will trigger password-reuse within 10s"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:20.000Z",
+            "url": "/login",
+            "host": "www.my-web.com",   
+            "content": "password=admin&tokenid=aaaa1111&user=admin"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:30.001Z",
+            "url": "/login",
+            "host": "www.not-my-web.com",   
+            "content": "password=admin&tokenid=aaaa1111&user=admin",
+            "_comment": "will NOT trigger password-reuse since over 10s"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:39.999Z",
+            "url": "/login",
+            "host": "www.my-web.com",   
+            "content": "password=admin&tokenid=aaaa1111&user=admin",
+            "_comment": "will trigger password-reuse within 10s"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:40.123Z",
+            "url": "/login",
+            "host": "www.not-my-web.com",   
+            "content": "password=admin&user=admin&tokenid=aaaa1111&",
+            "_comment": "will trigger password-reuse within 10s"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:50.000Z",
+            "url": "/login",
+            "host": "www.not-my-web.com",   
+            "content": "password=admin&user=admin&tokenid=aaaa1111&",
+            "_comment": "will NOT trigger password-reuse since it's the same host"
+          },
+          {
+            "timestamp": "2021-11-12T19:12:51.000Z",
+            "url": "/login",
+            "host": "www.talon-sec.com",
+            "content": "password=admin&user=admin&tokenid=aaaa1111&",
+            "_comment": "will trigger BOTH password-reuse within 10s and weak password"
+          }
+
+    ]
+}
