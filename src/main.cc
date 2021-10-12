@@ -27,7 +27,7 @@ enum argv_params_e {
   ARGV_PNAME              = 0,
   ARGV_SECURED_URLS_PATH  = 1,
   ARGV_PASSWORDS_PATH     = 2,
-  ARGV_JSON_CAPTUES       = 3,
+  ARGV_JSON_CAPTURES      = 3,
 
   NUM_OF_ARGV_PARAMS
 };
@@ -45,7 +45,10 @@ int main(
   for (int i = 0; i < argc; ++i)
       cout << argv[i] << "\n\n";
 
-  auto detector = make_unique<RulesDetector>(argv[ARGV_SECURED_URLS_PATH], argv[ARGV_PASSWORDS_PATH]);
+  auto detector = make_unique<RulesDetector>(argv[ARGV_SECURED_URLS_PATH], 
+                                             argv[ARGV_PASSWORDS_PATH],
+                                             argv[ARGV_JSON_CAPTURES]);
+  detector->execute();
 
   return result;
 }

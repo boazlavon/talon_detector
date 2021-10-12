@@ -18,6 +18,9 @@
 #include <iterator>
 #include <memory>
 
+#include "json/json.h"
+#include "commons.h"
+
 using namespace std;
 
 typedef enum detection_result_e{
@@ -30,16 +33,18 @@ class RulesDetector {
     public:
         // List of Detectors - Generic class
         // return a result from execution
-        RulesDetector(char *secured_urls_path, char *common_passwords_path);
+        RulesDetector(const char *secured_urls_path, const char *common_passwords_path, const char *captures_json);
 
         // execute on a json entry
-        detection_result_t add_capture(int a);
+        result_t execute(void);
         
     private:
         unordered_set<string> secured_urls;
         unordered_set<string> common_passwords;
+        string captures_json_path;
 
-        result_t init_string_set_from_file(char *strings_path, unordered_set<string>& strings_set);
+        result_t init_string_set_from_file(const char *strings_path, unordered_set<string>& strings_set);
+        detection_result_t add_capture(Json::Value entry);
 };
 
 #endif /* __RULES_DETECTOR_H__ */
