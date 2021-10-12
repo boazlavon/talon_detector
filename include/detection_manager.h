@@ -19,32 +19,30 @@
 #include <memory>
 
 #include "json/json.h"
+#include "common_password_detector.h"
 #include "commons.h"
 
 using namespace std;
-
-typedef enum detection_result_e{
+typedef enum detection_result_e {
     NO_DETECTION     = 0b00,
-    IDENTICAL_AUTH   = 0b01,
-    COMMON_PASSWORD  = 0b10
+    DETECTED_IDENTICAL_AUTH   = 0b01,
+    DETECTED_COMMON_PASSWORD  = 0b10
 } detection_result_t;
 
 class DetectionManager {
-    public:
-        // List of Detectors - Generic class
-        // return a result from execution
-        DetectionManager(const char *secured_urls_path, const char *common_passwords_path, const char *captures_json);
 
-        // execute on a json entry
-        result_t execute(void);
-        
-    private:
-        unordered_set<string> secured_urls;
+        /* Search, insertion, and removal have average constant-time complexity */
+        unordered_set<string> secured_hosts;
         unordered_set<string> common_passwords;
         string captures_json_path;
+        CommonPasswordDetector common_password_detector;
 
         result_t init_string_set_from_file(const char *strings_path, unordered_set<string>& strings_set);
         detection_result_t add_capture(Json::Value entry);
+
+    public:
+        DetectionManager(const char *secured_hosts_path, const char *common_passwords_path, const char *captures_json);
+        result_t execute(void);
 };
 
 #endif /* __DETECTION_MANAGER_H__ */
