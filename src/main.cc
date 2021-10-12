@@ -17,8 +17,8 @@
 #include <iterator>
 #include <memory>
 
-#include <commons.h>
-#include <rules_detector.h>
+#include "commons.h"
+#include "detection_manager.h"
 
 using namespace std;
 
@@ -45,9 +45,9 @@ int main(
   for (int i = 0; i < argc; ++i)
       cout << argv[i] << "\n\n";
 
-  auto detector = make_unique<RulesDetector>(argv[ARGV_SECURED_URLS_PATH], 
-                                             argv[ARGV_PASSWORDS_PATH],
-                                             argv[ARGV_JSON_CAPTURES]);
+  auto detector = make_unique<DetectionManager>(argv[ARGV_SECURED_URLS_PATH], 
+                                                argv[ARGV_PASSWORDS_PATH],
+                                                argv[ARGV_JSON_CAPTURES]);
   detector->execute();
 
   return result;

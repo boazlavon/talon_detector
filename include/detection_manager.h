@@ -1,11 +1,11 @@
 /**
- * @file rules_detector.h
+ * @file detection_manger.h
  *
  * @author Boaz Lavon
  * @date 10/21
  */
-#ifndef __RULES_DETECTOR_H__
-#define __RULES_DETECTOR_H__
+#ifndef __DETECTION_MANAGER_H__
+#define __DETECTION_MANAGER_H__
 
 #include <cstdlib>
 #include <string>
@@ -29,11 +29,11 @@ typedef enum detection_result_e{
     COMMON_PASSWORD  = 0b10
 } detection_result_t;
 
-class RulesDetector {
+class DetectionManager {
     public:
         // List of Detectors - Generic class
         // return a result from execution
-        RulesDetector(const char *secured_urls_path, const char *common_passwords_path, const char *captures_json);
+        DetectionManager(const char *secured_urls_path, const char *common_passwords_path, const char *captures_json);
 
         // execute on a json entry
         result_t execute(void);
@@ -47,4 +47,4 @@ class RulesDetector {
         detection_result_t add_capture(Json::Value entry);
 };
 
-#endif /* __RULES_DETECTOR_H__ */
+#endif /* __DETECTION_MANAGER_H__ */

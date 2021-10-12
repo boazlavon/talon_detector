@@ -1,5 +1,5 @@
 /**
- * @file rules_detector.cc
+ * @file detection_manager.cc
  *
  * @author Boaz Lavon
  
@@ -9,7 +9,7 @@
 #include "json/json.h"
 
 #include "commons.h"
-#include "rules_detector.h"
+#include "detection_manager.h"
 
 using namespace std;
 
@@ -37,7 +37,7 @@ void validate_captures_json(
   cout << "JSON is valid" << "\n";
 }
 
-RulesDetector::RulesDetector(
+DetectionManager::DetectionManager(
   const char *secured_urls_path, 
   const char *common_passwords_path,
   const char *captures_json_path
@@ -58,7 +58,7 @@ RulesDetector::RulesDetector(
 
 // the most compact way is to build a regex from this list
 result_t 
-RulesDetector::init_string_set_from_file(
+DetectionManager::init_string_set_from_file(
   const char *strings_path,
   unordered_set<string>& strings_set
 ) {
@@ -89,7 +89,7 @@ l_exit:
 }
 
 
-detection_result_t RulesDetector::add_capture(
+detection_result_t DetectionManager::add_capture(
   Json::Value entry
 ) {
 
@@ -100,7 +100,7 @@ detection_result_t RulesDetector::add_capture(
   return detection_result;
 }
 
-void RulesDetector::execute(void) {
+result_t DetectionManager::execute(void) {
   Json::Value root;
   Json::Value entry;
   detection_result_t detection_result;
