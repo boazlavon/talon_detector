@@ -12,10 +12,9 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
+#include <chrono>
 
 #include "json/json.h"
-#include "date.h"
-
 #include "commons.h"
 #include "identical_auth_detector.h"
 
@@ -37,43 +36,26 @@ using namespace std;
 //   }
 // }
 
-// static
-// bool
-// convert_timestamp_str(
-//   string timestamp_str, 
-//   chrono::duration<float>& time
-// ) {
-
-//   //const std::string in = "2018-12-09T00:00:00";
-//                        //"2021-11-12T19:12:19.879Z"
-//   std::stringstream ss(timestamp_str);
-
-//   if (ss > std::chrono::parse("%FT%TZ", time))
-//   {
-//       typedef std::chrono::milliseconds ms;
-//       ms d = std::chrono::duration_cast<ms>(time);
-//       std::cout << "Date: " << d.count() << '\n';
-//   }
-//   else{
-//       std::cout << "Error!\n";
-//   }
-// }#include "date.h"
-
-
 static
 time_t
-convert_timestamp_str(
+convert_timestamp_str_to_msec(
   string timestamp_str
 ) {    
-    std::tm tm = {};
-    const char *snext = ::strptime(timestamp_str.c_str(), "%Y-%m-%dT%H:%M:%S", &tm);
+    tm timestamp_tm = {};
+    time_t timestamp_sec = 0, timestamp_msec = 0;
+    char *snext = strptime(timestamp_str.c_str(), INPUT_TIMESTAMP_TEMPLATE, &timestamp_tm);
     if (NULL == snext) {
-      return 0;
+      return -1;
     }
-    auto time_point = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-    time_t duration_ms = time_point.time_since_epoch() / std::chrono::milliseconds(1) + std::atof(snext) * 1000.0f;
-    //std::cout << duration_ms << std::endl;
-    return duration_ms;
+
+    timestamp_sec = mktime(&timestamp_tm);
+    if (-1 == timestamp_sec) {
+      return -1;
+    }
+
+    timestamp_msec  = timestamp_sec * 1000; // convert to milliseconds
+    timestamp_msec += (time_t)(atof(snext) * 1000.0f);  // add milliseconds from timestamp str
+    return timestamp_msec;
 }
 
 bool 
@@ -81,11 +63,15 @@ IdenticalAuthDetector::detect(
   Json::Value& entry
 ) {
 
+  /* Extract Propertires */
   string host = entry["host"].asString();
   string timestamp_str = entry["timestamp"].asString();
-  // convert to timestamp
-  time_t timestamp_ms = convert_timestamp_str(timestamp_str);
-  cout << "timestamp_ms: " << timestamp_ms << "\n";
+  time_t timestamp_msec = convert_timestamp_str_to_msec(timestamp_str);
+  cout << "timestamp_ms: " << timestamp_msec << "\n";
+  if (-1 == timestamp_msec) {
+    return false;
+  }
+
   string password = extract_password(entry);
   if (password.empty()) {
     return false;

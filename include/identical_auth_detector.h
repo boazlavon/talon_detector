@@ -20,6 +20,9 @@
 #include "generic_detector.h"
 
 using namespace std;
+#define MAX_GAP_SEC (10)
+#define MAX_GAP_MSEC (MAX_GAP_SEC * 1000)
+#define INPUT_TIMESTAMP_TEMPLATE ("%Y-%m-%dT%H:%M:%S")
 
 class RequestEntry {
 	string user;
@@ -34,7 +37,6 @@ class RequestEntry {
 		user(user), password(password), url(url), timestamp(timestamp) {}
 };
 
-#define MAX_GAP_SEC (10)
 class IdenticalAuthDetector : GenericDetector {
 	/* map. (user, password) -> unsorted set of hosts */
 	//unsorted_map<string, shared_ptr<unordered_set<string> > > hosts_map;	
@@ -43,10 +45,10 @@ class IdenticalAuthDetector : GenericDetector {
 	//queue<shared_ptr<RequestEntry>> requests_queue;
     //requests_queue.push_back(make_shared<RequestEntry>(10, 2));
 
-	time_t max_gap_sec;
+	time_t max_gap_msec;
 
     public:
-		IdenticalAuthDetector() : max_gap_sec(MAX_GAP_SEC) {}
+		IdenticalAuthDetector() : max_gap_msec(MAX_GAP_MSEC) {}
     	virtual bool detect(Json::Value& entry);
 };
 

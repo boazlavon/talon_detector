@@ -6,8 +6,6 @@ BUILD_PATH = build
 BIN_PATH = $(BUILD_PATH)/bin
 JSONCPP_PATH = input_files/jsoncpp-1.8.4
 JSONCPP_LIB_PATH = $(JSONCPP_PATH)/src/lib_json
-DATE_PATH = input_files/date
-DATE_LIB_PATH = $(DATE_PATH)
 
 # executable # 
 BIN_NAME = detector
@@ -27,9 +25,9 @@ DEPS = $(OBJECTS:.o=.d)
 
 # flags #
 COMPILE_FLAGS = -std=c++14 -Wall -Wextra -g
-INCLUDES = -I include/ -I $(JSONCPP_PATH)/include -I $(DATE_PATH)/include/date
+INCLUDES = -I include/ -I $(JSONCPP_PATH)/include
 # Space-separated pkg-config libraries used by this project
-LIBS = $(JSONCPP_LIB_PATH)/libjsoncpp.a $(DATE_LIB_PATH)/libdate-tz.a
+LIBS = $(JSONCPP_LIB_PATH)/libjsoncpp.a
 
 .PHONY: default_target
 default_target: release
