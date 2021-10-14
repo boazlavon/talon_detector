@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <queue>
 #include <time.h>
 
 #include "json/json.h"
@@ -27,14 +28,15 @@ using namespace std;
 class RequestEntry {
 	string user;
 	string password;
-	string url;
-	time_t timestamp;
-	void clean_queue(time_t current_time);
-	string to_auth_string(void) { return "password=" + this->password + "user=" + this->user; }
+	string host;
+	time_t timestamp_msec;
 
 	public:
-		RequestEntry(string user, string password, string url, time_t timestamp) : \
-		user(user), password(password), url(url), timestamp(timestamp) {}
+		RequestEntry(string user, string password, string host, time_t timestamp_msec) : \
+					 user(user), password(password), host(host), timestamp_msec(timestamp_msec) {}
+		time_t get_timestamp_msec(void) { return this->timestamp_msec; }
+		string to_auth_string(void) { return "password=" + this->password + "user=" + this->user; }
+
 };
 
 class IdenticalAuthDetector : GenericDetector {
@@ -42,10 +44,10 @@ class IdenticalAuthDetector : GenericDetector {
 	//unsorted_map<string, shared_ptr<unordered_set<string> > > hosts_map;	
 
 	/* queue of items (user, password, time, host) */
-	//queue<shared_ptr<RequestEntry>> requests_queue;
-    //requests_queue.push_back(make_shared<RequestEntry>(10, 2));
+	queue<shared_ptr<RequestEntry>> requests_queue;
 
 	time_t max_gap_msec;
+	void clean_queue(time_t current_time_msec);
 
     public:
 		IdenticalAuthDetector() : max_gap_msec(MAX_GAP_MSEC) {}

@@ -12,6 +12,7 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
+#include <queue>
 #include <chrono>
 
 #include "json/json.h"
@@ -20,21 +21,26 @@
 
 using namespace std;
 
-// void
-// IdenticalAuthDetector::clean_queue(
-//   time_t current_time
-// ) {
+void
+IdenticalAuthDetector::clean_queue(
+  time_t current_time_msec
+) {
 
-//   shared_ptr<RequestEntry> iter;
-//   while (this->requests_queue.size() &\
-//          (current_time - this->requests_queue.front()->timestamp > this->max_gap_sec)
-//   ) {
-//     /* shared ptr will automaticly freed once the refference count zeros */
-//     iter = this->requests_queue.pop();
-//     this->hosts_map(iter->to_auth_string())
-//     // remove from hosts map
-//   }
-// }
+  shared_ptr<RequestEntry> iter = nullptr;
+  time_t diff = 0;
+  while (this->requests_queue.size())
+  {
+    iter = this->requests_queue.front();
+    diff = current_time_msec - iter->get_timestamp_msec();
+    if (diff <= this->max_gap_msec) {
+      break;
+    }
+
+    this->requests_queue.pop();
+    // remove from hosts map
+    // this->hosts_map(iter->to_auth_string())
+  }
+}
 
 static
 time_t
@@ -76,15 +82,25 @@ IdenticalAuthDetector::detect(
   if (password.empty()) {
     return false;
   }
+
   string user = extract_user(entry);
   if (user.empty()) {
     return false;
   }
 
-  // clean queue 
-  // add entry to queue
+  /* Update data stractures */
+  this->clean_queue(timestamp_msec);
+  this->requests_queue.push(make_shared<RequestEntry>(user, password, host, timestamp_msec));
+  cout << "queue: " << this->requests_queue.size() << "\n";
+  auto s = this->requests_queue.size();
+  for (int i = 0; i < s; ++i ) {
+    auto iter = this->requests_queue.front();
+    cout << this->requests_queue.front()->get_timestamp_msec() << "\n";
+    this->requests_queue.pop();
+    this->requests_queue.push(iter);
+  }
+  cout << "\n";
   // add entry to host map
-
   // detect
 
   return true;
