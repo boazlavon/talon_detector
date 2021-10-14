@@ -111,6 +111,17 @@ detection_result_t DetectionManager::add_capture(
     final_detection_result |= DETECTED_COMMON_PASSWORD;
   }
 
+  try {
+     detection_result = this->identical_auth_detector.detect(entry);
+  }
+  catch (...) {
+    cout << "Exception Catched";
+    detection_result = false;
+  }
+  if (detection_result) {
+    final_detection_result |= DETECTED_IDENTICAL_AUTH;
+  }
+
   return (detection_result_t)final_detection_result;
 }
 

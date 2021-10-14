@@ -20,6 +20,7 @@
 
 #include "json/json.h"
 #include "common_password_detector.h"
+#include "identical_auth_detector.h"
 #include "commons.h"
 
 using namespace std;
@@ -36,6 +37,7 @@ class DetectionManager {
         unordered_set<string> common_passwords;
         string captures_json_path;
         CommonPasswordDetector common_password_detector;
+        IdenticalAuthDetector  identical_auth_detector;
 
         result_t init_string_set_from_file(const char *strings_path, unordered_set<string>& strings_set);
         detection_result_t add_capture(Json::Value entry);
