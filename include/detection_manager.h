@@ -23,10 +23,9 @@
 #include "common_password_detector.h"
 #include "identical_auth_detector.h"
 
+using namespace std;
 
 #define DETECTORS_COUNT (2)
-
-using namespace std;
 typedef enum detection_result_e {
     NO_DETECTION     = 0b00,
     DETECTED_IDENTICAL_AUTH   = 0b01,
@@ -42,7 +41,7 @@ class DetectionManager {
 
         IdenticalAuthDetector  identical_auth_detector;
         CommonPasswordDetector common_password_detector;
-        GenericDetector *detectors[DETECTORS_COUNT] = {&identical_auth_detector, &common_password_detector};
+        GenericDetector   *detectors[DETECTORS_COUNT] = {&identical_auth_detector, &common_password_detector};
         detection_result_t detection_results[DETECTORS_COUNT] = {DETECTED_IDENTICAL_AUTH, DETECTED_COMMON_PASSWORD};
 
         detection_result_t add_capture(Json::Value entry);

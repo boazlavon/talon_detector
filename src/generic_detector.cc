@@ -8,9 +8,8 @@
 #include <iostream>
 #include <regex>
 #include <unordered_set>
+
 #include "json/json.h"
-
-
 #include "common_password_detector.h"
 
 using namespace std;
@@ -33,9 +32,8 @@ extract_content_entry(
     }
 
     string content = entry["content"].asString();
-    regex password_regex(entry_regex);
-
-    auto content_begin = sregex_iterator(content.begin(), content.end(), password_regex);
+    regex content_regex(entry_regex);
+    auto content_begin = sregex_iterator(content.begin(), content.end(), content_regex);
     auto content_end   = sregex_iterator();
     count = distance(content_begin, content_end);
     if (count != 1) {

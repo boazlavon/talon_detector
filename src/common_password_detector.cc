@@ -1,22 +1,21 @@
 /**
- * @file detection_manager.cc
+ * @file common_password_detector.cc
  *
  * @author Boaz Lavon
- 
- * @date 10/21 */
+ * @date 10/21 
+ */
 
 #include <iostream>
 #include <cassert>
 #include <unordered_set>
 
 #include "json/json.h"
-
-
 #include "common_password_detector.h"
 
 using namespace std;
 
 CommonPasswordDetector::CommonPasswordDetector() { 
+
   this->secured_hosts = NULL;
   this->common_passwords = NULL;
 }
@@ -25,12 +24,14 @@ void
 CommonPasswordDetector::set_secured_hosts(
   unordered_set<string> *secured_hosts
 ) {
+
   this->secured_hosts = secured_hosts;
 }
 
 void CommonPasswordDetector::set_common_passwords(
   unordered_set<string> *set_common_passwords
 ) {
+
   this->common_passwords = set_common_passwords;
 }
 
@@ -46,7 +47,7 @@ CommonPasswordDetector::detect(
     return false;
   }
 
-  /* is secured HOST */
+  /* is secured host ? */
   string host = entry["host"].asString();
   auto search_host = this->secured_hosts->find(host);
   if (search_host== this->secured_hosts->end()) {
