@@ -21,43 +21,12 @@
 
 using namespace std;
 
-void
-IdenticalAuthDetector::clean_queue(
-  time_t current_time_msec
-) {
-
-  shared_ptr<RequestEntry> iter = nullptr;
-  time_t diff = 0;
-  string auth;
-
-  while (this->requests_queue.size())
-  {
-    iter = this->requests_queue.front();
-    diff = current_time_msec - iter->get_timestamp_msec();
-    if (diff <= this->max_gap_msec) {
-      break;
-    }
-
-    /* remove host from hosts map */
-    auth = iter->get_auth();
-    auto search = this->hosts_map.find(auth);
-    if (search != this->hosts_map.end()) {
-      auto auth_hosts = search->second;
-      auth_hosts->erase(iter->get_host());
-      if (!auth_hosts->size()) {
-        this->hosts_map.erase(auth);
-      }
-    }
-
-    this->requests_queue.pop();
-  }
-}
-
 static
 time_t
 convert_timestamp_str_to_msec(
   string timestamp_str
 ) {    
+
     tm timestamp_tm = {};
     time_t timestamp_sec = 0, timestamp_msec = 0;
     char *snext = strptime(timestamp_str.c_str(), INPUT_TIMESTAMP_TEMPLATE, &timestamp_tm);
@@ -75,12 +44,80 @@ convert_timestamp_str_to_msec(
     return timestamp_msec;
 }
 
+static 
+void
+find_other_host(
+  shared_ptr<hosts_map_t> hosts_map,
+  string new_request_host,
+  shared_ptr<RequestEntry>& other_host_request
+) {
+
+  /* There is not specific requirment of which host to choose in case there is more than one different host.
+     So just pick the first one that is different.
+  */
+  hosts_map_t::iterator iter = hosts_map->begin();
+  while (hosts_map->size() && iter != hosts_map->end()) {
+    if (iter->first != new_request_host) {
+      other_host_request = iter->second->front();
+      break;
+    }
+    iter++;
+  }
+}
+
+
+void
+IdenticalAuthDetector::clean_queue(
+  shared_ptr<requests_queue_t> requests_queue,
+  time_t current_time_msec
+) {
+
+  shared_ptr<RequestEntry> iter = nullptr;
+  time_t diff = 0;
+
+  while (requests_queue->size())
+  {
+    iter = requests_queue->front();
+    diff = current_time_msec - iter->get_timestamp_msec();
+    if (diff <= this->max_gap_msec) {
+      break;
+    }
+
+    requests_queue->pop();
+  }
+}
+
+void
+IdenticalAuthDetector::clean_host_queues(
+  shared_ptr<hosts_map_t> hosts_map,
+  time_t current_time_msec
+) {
+
+  shared_ptr<requests_queue_t> requests_queue = nullptr;
+  hosts_map_t::iterator iter = hosts_map->begin();
+  while (hosts_map->size() && iter != hosts_map->end()) {
+      /* request queue for a specific host */
+      requests_queue = iter->second;
+
+      /* remove all the requests that are older than 10sec since this new request timestamp */
+      this->clean_queue(requests_queue, current_time_msec);
+
+      /* if there are not more requests under this host, remove the host from the hosts map */
+      if (!requests_queue->size()) {
+        iter = hosts_map->erase(iter);
+        continue;
+      } 
+
+      iter++;
+  }
+}
+
+
 bool 
 IdenticalAuthDetector::detect(
   Json::Value& entry
 ) {
 
-  shared_ptr<unordered_set<string>> auth_hosts = nullptr;
   /* Extract Propertires */
   string host = entry["host"].asString();
   string timestamp_str = entry["timestamp"].asString();
@@ -98,30 +135,57 @@ IdenticalAuthDetector::detect(
   if (user.empty()) {
     return false;
   }
+  shared_ptr<RequestEntry> request = make_shared<RequestEntry>(user, password, host, timestamp_msec);
 
-  /* Update data stractures */
-  this->clean_queue(timestamp_msec);
-  this->requests_queue.push(make_shared<RequestEntry>(user, password, host, timestamp_msec));
-  cout << "queue: " << this->requests_queue.size() << "\n";
-
-  // auto s = this->requests_queue.size();
-  // for (int i = 0; i < s; ++i ) {
-  //   auto iter = this->requests_queue.front();
-  //    cout <<  iter->get_timestamp_msec() << ": " << iter->get_auth() << " -> " << iter->get_host() << "\n";
-  //   this->requests_queue.pop();
-  //   this->requests_queue.push(iter);
-  // }
-  // cout << "\n";
-
-  // add entry to host map
-  string auth = this->requests_queue.back()->get_auth();
-  auto search = this->hosts_map.find(auth);
-  if (search == this->hosts_map.end()) {
-    this->hosts_map[auth] = make_shared<unordered_set<string>>();
-    search = this->hosts_map.find(auth);
+  /* find a hosts map belong to this user & password pair - auth */
+  string auth = request->get_auth();
+  auto search_host_map = this->auth_map.find(auth);
+  if (search_host_map == this->auth_map.end()) {
+    this->auth_map.insert({auth, make_shared<hosts_map_t>()});
+    search_host_map = this->auth_map.find(auth);
   }
 
-  auth_hosts = search->second; // shared pointer to unordered set.
-  auth_hosts->insert(host);
-  return (auth_hosts->size() > 1); 
+  /* clean host queues from requests that are older than 10sec since this new request */
+  shared_ptr<hosts_map_t> hosts_map = search_host_map->second;
+  this->clean_host_queues(hosts_map, timestamp_msec);
+
+  /* add a new request */
+  auto search_host_queue = hosts_map->find(host);
+  if (search_host_queue == hosts_map->end()) {
+    hosts_map->insert({host, make_shared<requests_queue_t>()});
+    search_host_queue = hosts_map->find(host);
+  }
+
+  shared_ptr<requests_queue_t> requests_queue = search_host_queue->second;
+  requests_queue->push(request);
+
+#ifdef DEBUG
+  /* print queue */
+  cout << auth << "\n";
+  shared_ptr<RequestEntry> iter_requests = nullptr;
+  for (auto& iter_hosts: (*hosts_map)) {
+      // clean queue
+      cout << "\t" << iter_hosts.first << "\n";
+      auto s = iter_hosts.second->size();
+      for (int i = 0; i < (int)s; ++i) {
+         iter_requests = iter_hosts.second->front();
+         cout <<  "\t\t" << iter_requests->get_timestamp_msec() << "\n";
+         iter_hosts.second->pop();
+         iter_hosts.second->push(iter_requests);
+      }
+  }
+  cout << "\n";
+#endif
+
+  if (hosts_map->size() > 1) {
+    shared_ptr<RequestEntry> other_host_request = nullptr;
+    find_other_host(hosts_map, request->get_host(), other_host_request);
+    if (nullptr != other_host_request) {
+      time_t diff_msec = request->get_timestamp_msec() - other_host_request->get_timestamp_msec();
+      cout << "Identical User/Password pair found diff under " << (this->max_gap_msec / 1000) << "s" << ": " << diff_msec << "ms in host " << host << " user/pass: " << user << "/" << password << "\n";
+    } else {
+      cout << "Error\n";
+    }
+  }
+  return (hosts_map->size() > 1); 
 }

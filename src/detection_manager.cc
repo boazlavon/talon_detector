@@ -18,11 +18,17 @@ void
 validate_captures_json(
   const char *captures_json_path
 ) {
+
   Json::Value root;
   Json::Value entry;
 
-  ifstream file(captures_json_path);
-  file >> root;
+  ifstream json_file(captures_json_path);
+  if (!json_file) {
+    cerr << "File \"" << captures_json_path << "\" could not be opened\n";
+    throw runtime_error("Invalid JSON file");
+  }
+
+  json_file >> root;
   if (!root.isMember("requests") || !root["requests"].size()) {
     throw runtime_error("Invalid JSON file");
   }
@@ -36,40 +42,34 @@ validate_captures_json(
         throw runtime_error("Invalid JSON file");
       }
   }
+#ifdef DEBUG
   cout << "JSON is valid" << "\n";
+#endif
 }
 
 
 static
-result_t 
+void
 init_string_set_from_file(
   const char *strings_path,
   unordered_set<string>& strings_set
 ) {
 
-  result_t result = RESULT_SUCESS;
   ifstream inputFile(strings_path);
   string line;
 
-  if(!inputFile) {
+  if (!inputFile) {
     cerr << "File \"" << strings_path << "\" could not be opened\n";
-    result = ERROR_OPEN_FILE;
-    goto l_exit;
+    throw runtime_error("Cannot open " + string(strings_path));
   }
 
   while (getline(inputFile, line)) {
     strings_set.insert(line);
   }
 
+#ifdef DEBUG
   cout << "Entries count:" << strings_set.size() << "\n";
-
-  //for (auto ptr : strings_set) {
-  //   cout << ptr << "\n";
-  //}
-  //cout << "\n";
-
-l_exit:
-  return result;
+#endif
 }
 
 
@@ -78,16 +78,20 @@ DetectionManager::DetectionManager(
   const char *common_passwords_path,
   const char *captures_json_path
 ) {
-  cout << "Secured HOSTs: " << secured_hosts_path << "\n";
-  init_string_set_from_file(secured_hosts_path, this->secured_hosts);
-  cout << "\n";
 
-  cout << "Common Passwords: " << common_passwords_path << "\n";  cout << "\n";
+#ifdef DEBUG
+  cout << "Secured HOSTs: " << secured_hosts_path << "\n\n";
+#endif
+  init_string_set_from_file(secured_hosts_path, this->secured_hosts);
+
+#ifdef DEBUG
+  cout << "Common Passwords: " << common_passwords_path << "\n\n";  
+#endif
   init_string_set_from_file(common_passwords_path, this->common_passwords);
 
-  /* Validate JSON file */
-  cout << "\n";
+#ifdef DEBUG
   cout << "Captures JSON: " << captures_json_path << "\n";
+#endif
   validate_captures_json(captures_json_path);
   this->captures_json_path = string(captures_json_path);
 
@@ -95,7 +99,8 @@ DetectionManager::DetectionManager(
   this->common_password_detector.set_common_passwords(&(this->common_passwords));
 }
 
-detection_result_t DetectionManager::add_capture(
+detection_result_t 
+DetectionManager::add_capture(
   Json::Value entry
 ) {
 
@@ -106,9 +111,10 @@ detection_result_t DetectionManager::add_capture(
      detection_result = this->common_password_detector.detect(entry);
   }
   catch (...) {
-    cout << "Exception Catched";
+    cerr << "Error: Catched Exception";
     detection_result = false;
   }
+
   if (detection_result) {
     final_detection_result |= DETECTED_COMMON_PASSWORD;
   }
@@ -117,7 +123,7 @@ detection_result_t DetectionManager::add_capture(
      detection_result = this->identical_auth_detector.detect(entry);
   }
   catch (...) {
-    cout << "Exception Catched";
+    cerr << "Error: Catched Exception";
     detection_result = false;
   }
   if (detection_result) {
@@ -127,20 +133,19 @@ detection_result_t DetectionManager::add_capture(
   return (detection_result_t)final_detection_result;
 }
 
-result_t DetectionManager::execute(void) {
+void
+DetectionManager::execute(void) {
+
   Json::Value root;
   Json::Value entry;
   detection_result_t detection_result;
 
-  cout << this->captures_json_path << "\n";
-  ifstream file(this->captures_json_path);
-  file >> root;
-  //cout << root;
+  ifstream json_file(this->captures_json_path);
+  json_file >> root;
 
   for (Json::Value::ArrayIndex i = 0; i < root["requests"].size(); i++) {
       entry = root["requests"][i];
       detection_result = add_capture(entry);
       cout << (int)i << ")\t" << "ts: " << entry["timestamp"].asString() << "\tresult: " << (int)detection_result << "\n";
   }
-  return RESULT_SUCESS;
 }

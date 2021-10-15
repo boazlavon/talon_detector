@@ -43,7 +43,7 @@ class DetectionManager {
 
     public:
         DetectionManager(const char *secured_hosts_path, const char *common_passwords_path, const char *captures_json);
-        result_t execute(void);
+        void execute(void);
 };
 
 #endif /* __DETECTION_MANAGER_H__ */

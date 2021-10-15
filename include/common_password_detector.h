@@ -15,6 +15,7 @@ using namespace std;
 
 class CommonPasswordDetector : GenericDetector {
 	private:
+		/* this are not smart pointers since there is not need to free those pointers */
 		unordered_set<string> *secured_hosts;
 		unordered_set<string> *common_passwords;
 

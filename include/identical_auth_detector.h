@@ -40,15 +40,20 @@ class RequestEntry {
 		string get_host(void) { return this->host; }
 };
 
+typedef queue<shared_ptr<RequestEntry>> requests_queue_t;
+typedef unordered_map<string, shared_ptr<requests_queue_t>> hosts_map_t; // host : requests queue
+typedef unordered_map<string, shared_ptr<hosts_map_t>> auth_map_t; // auth (user&password) : hosts map
+
 class IdenticalAuthDetector : GenericDetector {
 	/* map. (user, password) -> unsorted set of hosts */
-	unordered_map<string, shared_ptr<unordered_set<string>>> hosts_map;	
-
+	auth_map_t auth_map;
+	//unordered_map<string, shared_ptr<unordered_map<string>>> hosts_map;	
 	/* queue of items (user, password, time, host) */
-	queue<shared_ptr<RequestEntry>> requests_queue;
+	//queue<shared_ptr<RequestEntry>> requests_queue;
 
 	time_t max_gap_msec;
-	void clean_queue(time_t current_time_msec);
+	void clean_queue(shared_ptr<requests_queue_t> requests_queue, time_t current_time_msec);
+	void clean_host_queues(shared_ptr<hosts_map_t> hosts_map, time_t current_time_msec);
 
     public:
 		IdenticalAuthDetector() : max_gap_msec(MAX_GAP_MSEC) {}
