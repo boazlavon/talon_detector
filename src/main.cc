@@ -35,7 +35,7 @@ enum argv_params_e {
 typedef enum result_e : int {
 
   RESULT_SUCESS = 0,
-  ERROR_UNKNOWN,
+  RESULT_FAILURE,
   ERROR_INPUT_PARAMS
 
 } result_t;
@@ -57,7 +57,7 @@ int main(
                                                                          argv[ARGV_JSON_CAPTURES]);
     manager->execute();
   } catch (...) {
-    result = ERROR_UNKNOWN;
+    result = RESULT_FAILURE;
   }
 
   return result;
