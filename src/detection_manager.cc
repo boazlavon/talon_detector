@@ -14,7 +14,8 @@
 using namespace std;
 
 static
-void validate_captures_json(
+void 
+validate_captures_json(
   const char *captures_json_path
 ) {
   Json::Value root;
@@ -38,31 +39,10 @@ void validate_captures_json(
   cout << "JSON is valid" << "\n";
 }
 
-DetectionManager::DetectionManager(
-  const char *secured_hosts_path, 
-  const char *common_passwords_path,
-  const char *captures_json_path
-) {
-  cout << "Secured HOSTs: " << secured_hosts_path << "\n";
-  init_string_set_from_file(secured_hosts_path, this->secured_hosts);
-  cout << "\n";
 
-  cout << "Common Passwords: " << common_passwords_path << "\n";  cout << "\n";
-  init_string_set_from_file(common_passwords_path, this->common_passwords);
-
-  /* Validate JSON file */
-  cout << "\n";
-  cout << "Captures JSON: " << captures_json_path << "\n";
-  validate_captures_json(captures_json_path);
-  this->captures_json_path = string(captures_json_path);
-
-  this->common_password_detector.set_secured_hosts(&(this->secured_hosts));
-  this->common_password_detector.set_common_passwords(&(this->common_passwords));
-}
-
-// the most compact way is to build a regex from this list
+static
 result_t 
-DetectionManager::init_string_set_from_file(
+init_string_set_from_file(
   const char *strings_path,
   unordered_set<string>& strings_set
 ) {
@@ -92,6 +72,28 @@ l_exit:
   return result;
 }
 
+
+DetectionManager::DetectionManager(
+  const char *secured_hosts_path, 
+  const char *common_passwords_path,
+  const char *captures_json_path
+) {
+  cout << "Secured HOSTs: " << secured_hosts_path << "\n";
+  init_string_set_from_file(secured_hosts_path, this->secured_hosts);
+  cout << "\n";
+
+  cout << "Common Passwords: " << common_passwords_path << "\n";  cout << "\n";
+  init_string_set_from_file(common_passwords_path, this->common_passwords);
+
+  /* Validate JSON file */
+  cout << "\n";
+  cout << "Captures JSON: " << captures_json_path << "\n";
+  validate_captures_json(captures_json_path);
+  this->captures_json_path = string(captures_json_path);
+
+  this->common_password_detector.set_secured_hosts(&(this->secured_hosts));
+  this->common_password_detector.set_common_passwords(&(this->common_passwords));
+}
 
 detection_result_t DetectionManager::add_capture(
   Json::Value entry

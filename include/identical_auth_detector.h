@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <time.h>
 
@@ -35,13 +36,13 @@ class RequestEntry {
 		RequestEntry(string user, string password, string host, time_t timestamp_msec) : \
 					 user(user), password(password), host(host), timestamp_msec(timestamp_msec) {}
 		time_t get_timestamp_msec(void) { return this->timestamp_msec; }
-		string to_auth_string(void) { return "password=" + this->password + "user=" + this->user; }
-
+		string get_auth(void) { return "user=" + this->user + "&password=" + this->password; }
+		string get_host(void) { return this->host; }
 };
 
 class IdenticalAuthDetector : GenericDetector {
 	/* map. (user, password) -> unsorted set of hosts */
-	//unsorted_map<string, shared_ptr<unordered_set<string> > > hosts_map;	
+	unordered_map<string, shared_ptr<unordered_set<string>>> hosts_map;	
 
 	/* queue of items (user, password, time, host) */
 	queue<shared_ptr<RequestEntry>> requests_queue;

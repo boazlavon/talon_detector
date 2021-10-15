@@ -28,6 +28,8 @@ IdenticalAuthDetector::clean_queue(
 
   shared_ptr<RequestEntry> iter = nullptr;
   time_t diff = 0;
+  string auth;
+
   while (this->requests_queue.size())
   {
     iter = this->requests_queue.front();
@@ -36,9 +38,18 @@ IdenticalAuthDetector::clean_queue(
       break;
     }
 
+    /* remove host from hosts map */
+    auth = iter->get_auth();
+    auto search = this->hosts_map.find(auth);
+    if (search != this->hosts_map.end()) {
+      auto auth_hosts = search->second;
+      auth_hosts->erase(iter->get_host());
+      if (!auth_hosts->size()) {
+        this->hosts_map.erase(auth);
+      }
+    }
+
     this->requests_queue.pop();
-    // remove from hosts map
-    // this->hosts_map(iter->to_auth_string())
   }
 }
 
@@ -69,11 +80,11 @@ IdenticalAuthDetector::detect(
   Json::Value& entry
 ) {
 
+  shared_ptr<unordered_set<string>> auth_hosts = nullptr;
   /* Extract Propertires */
   string host = entry["host"].asString();
   string timestamp_str = entry["timestamp"].asString();
   time_t timestamp_msec = convert_timestamp_str_to_msec(timestamp_str);
-  cout << "timestamp_ms: " << timestamp_msec << "\n";
   if (-1 == timestamp_msec) {
     return false;
   }
@@ -92,17 +103,25 @@ IdenticalAuthDetector::detect(
   this->clean_queue(timestamp_msec);
   this->requests_queue.push(make_shared<RequestEntry>(user, password, host, timestamp_msec));
   cout << "queue: " << this->requests_queue.size() << "\n";
-  auto s = this->requests_queue.size();
-  for (int i = 0; i < s; ++i ) {
-    auto iter = this->requests_queue.front();
-    cout << this->requests_queue.front()->get_timestamp_msec() << "\n";
-    this->requests_queue.pop();
-    this->requests_queue.push(iter);
-  }
-  cout << "\n";
+
+  // auto s = this->requests_queue.size();
+  // for (int i = 0; i < s; ++i ) {
+  //   auto iter = this->requests_queue.front();
+  //    cout <<  iter->get_timestamp_msec() << ": " << iter->get_auth() << " -> " << iter->get_host() << "\n";
+  //   this->requests_queue.pop();
+  //   this->requests_queue.push(iter);
+  // }
+  // cout << "\n";
+
   // add entry to host map
-  // detect
+  string auth = this->requests_queue.back()->get_auth();
+  auto search = this->hosts_map.find(auth);
+  if (search == this->hosts_map.end()) {
+    this->hosts_map[auth] = make_shared<unordered_set<string>>();
+    search = this->hosts_map.find(auth);
+  }
 
-  return true;
+  auth_hosts = search->second; // shared pointer to unordered set.
+  auth_hosts->insert(host);
+  return (auth_hosts->size() > 1); 
 }
-

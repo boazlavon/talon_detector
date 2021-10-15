@@ -39,7 +39,6 @@ class DetectionManager {
         CommonPasswordDetector common_password_detector;
         IdenticalAuthDetector  identical_auth_detector;
 
-        result_t init_string_set_from_file(const char *strings_path, unordered_set<string>& strings_set);
         detection_result_t add_capture(Json::Value entry);
 
     public:
