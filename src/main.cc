@@ -17,7 +17,7 @@
 #include <iterator>
 #include <memory>
 
-#include "commons.h"
+
 #include "detection_manager.h"
 
 using namespace std;

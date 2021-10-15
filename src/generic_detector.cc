@@ -10,7 +10,7 @@
 #include <unordered_set>
 #include "json/json.h"
 
-#include "commons.h"
+
 #include "common_password_detector.h"
 
 using namespace std;

@@ -19,9 +19,12 @@
 #include <memory>
 
 #include "json/json.h"
+#include "generic_detector.h"
 #include "common_password_detector.h"
 #include "identical_auth_detector.h"
-#include "commons.h"
+
+
+#define DETECTORS_COUNT (2)
 
 using namespace std;
 typedef enum detection_result_e {
@@ -36,8 +39,11 @@ class DetectionManager {
         unordered_set<string> secured_hosts;
         unordered_set<string> common_passwords;
         string captures_json_path;
-        CommonPasswordDetector common_password_detector;
+
         IdenticalAuthDetector  identical_auth_detector;
+        CommonPasswordDetector common_password_detector;
+        GenericDetector *detectors[DETECTORS_COUNT] = {&identical_auth_detector, &common_password_detector};
+        detection_result_t detection_results[DETECTORS_COUNT] = {DETECTED_IDENTICAL_AUTH, DETECTED_COMMON_PASSWORD};
 
         detection_result_t add_capture(Json::Value entry);
 

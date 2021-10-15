@@ -8,7 +8,6 @@
 #include <iostream>
 #include "json/json.h"
 
-#include "commons.h"
 #include "detection_manager.h"
 
 using namespace std;
@@ -107,27 +106,18 @@ DetectionManager::add_capture(
   int final_detection_result = NO_DETECTION;
   bool detection_result = false;
 
-  try {
-     detection_result = this->common_password_detector.detect(entry);
-  }
-  catch (...) {
-    cerr << "Error: Catched Exception";
-    detection_result = false;
-  }
+  for (size_t i = 0; i < DETECTORS_COUNT; ++i) {
+    try {
+      detection_result = this->detectors[i]->detect(entry);
+    }
+    catch (...) {
+      cerr << "Error: Catched Exception";
+      detection_result = false;
+    }
 
-  if (detection_result) {
-    final_detection_result |= DETECTED_COMMON_PASSWORD;
-  }
-
-  try {
-     detection_result = this->identical_auth_detector.detect(entry);
-  }
-  catch (...) {
-    cerr << "Error: Catched Exception";
-    detection_result = false;
-  }
-  if (detection_result) {
-    final_detection_result |= DETECTED_IDENTICAL_AUTH;
+    if (detection_result) {
+      final_detection_result |= this->detection_results[i];
+    }
   }
 
   return (detection_result_t)final_detection_result;

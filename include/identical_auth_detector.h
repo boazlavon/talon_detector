@@ -18,7 +18,7 @@
 #include <time.h>
 
 #include "json/json.h"
-#include "commons.h"
+
 #include "generic_detector.h"
 
 using namespace std;
@@ -44,7 +44,7 @@ typedef queue<shared_ptr<RequestEntry>> requests_queue_t;
 typedef unordered_map<string, shared_ptr<requests_queue_t>> hosts_map_t; // host : requests queue
 typedef unordered_map<string, shared_ptr<hosts_map_t>> auth_map_t; // auth (user&password) : hosts map
 
-class IdenticalAuthDetector : GenericDetector {
+class IdenticalAuthDetector : public GenericDetector {
 	/* map. (user, password) -> unsorted set of hosts */
 	auth_map_t auth_map;
 	//unordered_map<string, shared_ptr<unordered_map<string>>> hosts_map;	

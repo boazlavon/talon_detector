@@ -8,7 +8,7 @@
 #define __GENERIC_DETECTOR_H__
 
 #include "json/json.h"
-#include "commons.h"
+
 
 using namespace std;
 

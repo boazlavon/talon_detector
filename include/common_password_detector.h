@@ -8,12 +8,12 @@
 #define __COMMON_PASSWORD_DETECTOR_H__
 
 #include "json/json.h"
-#include "commons.h"
+
 #include "generic_detector.h"
 
 using namespace std;
 
-class CommonPasswordDetector : GenericDetector {
+class CommonPasswordDetector : public GenericDetector {
 	private:
 		/* this are not smart pointers since there is not need to free those pointers */
 		unordered_set<string> *secured_hosts;
