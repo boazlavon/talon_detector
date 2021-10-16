@@ -9,6 +9,9 @@
 #include "json/json.h"
 
 #include "detection_manager.h"
+#include "generic_detector.h"
+#include "common_password_detector.h"
+#include "identical_auth_detector.h"
 
 using namespace std;
 
@@ -20,7 +23,6 @@ validate_captures_json(
 
   Json::Value root;
   Json::Value entry;
-
   ifstream json_file(captures_json_path);
   if (!json_file) {
     cerr << "File \"" << captures_json_path << "\" could not be opened\n";
@@ -51,7 +53,7 @@ static
 void
 init_string_set_from_file(
   const char *strings_path,
-  unordered_set<string>& strings_set
+  shared_ptr<unordered_set<string>>& strings_set
 ) {
 
   ifstream inputFile(strings_path);
@@ -63,11 +65,11 @@ init_string_set_from_file(
   }
 
   while (getline(inputFile, line)) {
-    strings_set.insert(line);
+    strings_set->insert(line);
   }
 
 #ifdef DEBUG
-  cout << "Entries count:" << strings_set.size() << "\n";
+  cout << "Entries count:" << strings_set->size() << "\n";
 #endif
 }
 
@@ -81,21 +83,27 @@ DetectionManager::DetectionManager(
 #ifdef DEBUG
   cout << "Secured HOSTs: " << secured_hosts_path << "\n\n";
 #endif
+  this->secured_hosts = make_shared<unordered_set<string>>();
   init_string_set_from_file(secured_hosts_path, this->secured_hosts);
 
 #ifdef DEBUG
   cout << "Common Passwords: " << common_passwords_path << "\n\n";  
 #endif
+  this->common_passwords = make_shared<unordered_set<string>>();
   init_string_set_from_file(common_passwords_path, this->common_passwords);
 
 #ifdef DEBUG
   cout << "Captures JSON: " << captures_json_path << "\n";
 #endif
   validate_captures_json(captures_json_path);
-  this->captures_json_path = string(captures_json_path);
 
-  this->common_password_detector.set_secured_hosts(&(this->secured_hosts));
-  this->common_password_detector.set_common_passwords(&(this->common_passwords));
+  /* init detectors */
+  this->captures_json_path = string(captures_json_path);
+  this->identical_auth_detector  = make_shared<IdenticalAuthDetector>();
+  this->detectors[0] = dynamic_pointer_cast<GenericDetector>(this->identical_auth_detector);
+
+  this->common_password_detector = make_shared<CommonPasswordDetector>(secured_hosts, common_passwords);
+  this->detectors[1] = dynamic_pointer_cast<GenericDetector>(this->common_password_detector);
 }
 
 detection_result_t 

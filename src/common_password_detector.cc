@@ -8,40 +8,17 @@
 #include <iostream>
 #include <cassert>
 #include <unordered_set>
+#include <memory>
 
 #include "json/json.h"
 #include "common_password_detector.h"
 
 using namespace std;
 
-CommonPasswordDetector::CommonPasswordDetector() { 
-
-  this->secured_hosts = NULL;
-  this->common_passwords = NULL;
-}
-
-void 
-CommonPasswordDetector::set_secured_hosts(
-  unordered_set<string> *secured_hosts
-) {
-
-  this->secured_hosts = secured_hosts;
-}
-
-void CommonPasswordDetector::set_common_passwords(
-  unordered_set<string> *set_common_passwords
-) {
-
-  this->common_passwords = set_common_passwords;
-}
-
 bool 
 CommonPasswordDetector::detect(
   Json::Value& entry
 ) {
-
-  assert(this->common_passwords != NULL);
-  assert(this->secured_hosts != NULL);
 
   if (!entry.isMember("host")) {
     return false;

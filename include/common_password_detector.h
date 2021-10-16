@@ -7,22 +7,24 @@
 #ifndef __COMMON_PASSWORD_DETECTOR_H__
 #define __COMMON_PASSWORD_DETECTOR_H__
 
-#include "json/json.h"
+#include <memory>
 
+#include "json/json.h"
 #include "generic_detector.h"
 
 using namespace std;
 
 class CommonPasswordDetector : public GenericDetector {
-	/* this are not smart pointers since there is not need to free those pointers */
-	unordered_set<string> *secured_hosts;
-	unordered_set<string> *common_passwords;
+	shared_ptr<unordered_set<string>> secured_hosts;
+	shared_ptr<unordered_set<string>> common_passwords;
 
     public:
-		CommonPasswordDetector();
+		CommonPasswordDetector(
+			shared_ptr<unordered_set<string>> secured_hosts,
+			shared_ptr<unordered_set<string>> common_passwords
+		) : secured_hosts(secured_hosts), common_passwords(common_passwords) {}
+
     	virtual bool detect(Json::Value& entry);
-		void set_secured_hosts(unordered_set<string> *secured_hosts);
-		void set_common_passwords(unordered_set<string> *set_common_passwords);
 };
 
 #endif /* __COMMON_PASSWORD_DETECTOR_H__ */

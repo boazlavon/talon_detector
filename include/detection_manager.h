@@ -35,13 +35,13 @@ typedef enum detection_result_e {
 class DetectionManager {
 
         /* Search, insertion, and removal have average constant-time complexity */
-        unordered_set<string> secured_hosts;
-        unordered_set<string> common_passwords;
+        shared_ptr<unordered_set<string>> secured_hosts;
+        shared_ptr<unordered_set<string>> common_passwords;
         string captures_json_path;
 
-        IdenticalAuthDetector  identical_auth_detector;
-        CommonPasswordDetector common_password_detector;
-        GenericDetector   *detectors[DETECTORS_COUNT] = {&identical_auth_detector, &common_password_detector};
+        shared_ptr<IdenticalAuthDetector>  identical_auth_detector;
+        shared_ptr<CommonPasswordDetector> common_password_detector;
+        shared_ptr<GenericDetector> detectors[DETECTORS_COUNT];
         detection_result_t detection_results[DETECTORS_COUNT] = {DETECTED_IDENTICAL_AUTH, DETECTED_COMMON_PASSWORD};
 
         detection_result_t add_capture(Json::Value entry);
