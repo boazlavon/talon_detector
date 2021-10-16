@@ -52,9 +52,9 @@ int main(
   }
 
   try {
-    shared_ptr<DetectionManager> manager = make_unique<DetectionManager>(argv[ARGV_SECURED_HOSTS_PATH], 
-                                                                         argv[ARGV_PASSWORDS_PATH],
-                                                                         argv[ARGV_JSON_CAPTURES]);
+    shared_ptr<DetectionManager> manager = make_unique<DetectionManager>(string(argv[ARGV_SECURED_HOSTS_PATH]),
+                                                                         string(argv[ARGV_PASSWORDS_PATH]),
+                                                                         string(argv[ARGV_JSON_CAPTURES]));
     manager->execute();
   } catch (...) {
     result = RESULT_FAILURE;

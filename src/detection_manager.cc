@@ -18,7 +18,7 @@ using namespace std;
 static
 void 
 validate_captures_json(
-  const char *captures_json_path
+  string captures_json_path
 ) {
 
   Json::Value root;
@@ -52,7 +52,7 @@ validate_captures_json(
 static
 void
 init_string_set_from_file(
-  const char *strings_path,
+  string strings_path,
   shared_ptr<unordered_set<string>>& strings_set
 ) {
 
@@ -75,9 +75,9 @@ init_string_set_from_file(
 
 
 DetectionManager::DetectionManager(
-  const char *secured_hosts_path, 
-  const char *common_passwords_path,
-  const char *captures_json_path
+  string secured_hosts_path, 
+  string common_passwords_path,
+  string captures_json_path
 ) {
 
 #ifdef DEBUG

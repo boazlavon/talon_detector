@@ -47,7 +47,7 @@ class DetectionManager {
         detection_result_t add_capture(Json::Value entry);
 
     public:
-        DetectionManager(const char *secured_hosts_path, const char *common_passwords_path, const char *captures_json);
+        DetectionManager(string secured_hosts_path, string common_passwords_path, string captures_json);
         void execute(void);
 };
 
