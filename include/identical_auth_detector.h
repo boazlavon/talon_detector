@@ -40,9 +40,9 @@ class RequestEntry {
 		string get_host() { return this->host; }
 };
 
-typedef queue<shared_ptr<RequestEntry>> requests_queue_t;
-typedef unordered_map<string, shared_ptr<requests_queue_t>> hosts_map_t; // host -> requests queue
-typedef unordered_map<string, shared_ptr<hosts_map_t>> auth_map_t; // auth (user&password) -> hosts map
+using requests_queue_t = queue<shared_ptr<RequestEntry>> ;
+using hosts_map_t      = unordered_map<string, shared_ptr<requests_queue_t>>; // host -> requests queue
+using auth_map_t       = unordered_map<string, shared_ptr<hosts_map_t>>;      // auth (user&password) -> hosts map
 
 class IdenticalAuthDetector : public GenericDetector {
 	auth_map_t auth_map;

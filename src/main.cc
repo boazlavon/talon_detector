@@ -32,13 +32,13 @@ enum argv_params_e {
   NUM_OF_ARGV_PARAMS
 };
 
-typedef enum result_e : int {
+using result_t = enum result_e : int {
 
   RESULT_SUCESS = 0,
   RESULT_FAILURE,
   ERROR_INPUT_PARAMS
 
-} result_t;
+};
 
 int main(
   int   argc, 
