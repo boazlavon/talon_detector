@@ -6,16 +6,16 @@
  * @date 10/21 */
 
 #include <iostream>
-#include <cassert>
 #include <unordered_set>
-#include <time.h>
 #include <string>
 #include <unordered_map>
-#include <sstream>
 #include <queue>
 #include <chrono>
+#include <cassert>
+#include <sstream>
 
 #include "json/json.h"
+#include "date.h"
 #include "identical_auth_detector.h"
 
 using namespace std;
@@ -25,21 +25,14 @@ time_t
 convert_timestamp_str_to_msec(
   const string& timestamp_str
 ) {    
-
-    tm timestamp_tm = {};
-    time_t timestamp_sec = 0, timestamp_msec = 0;
-    char *snext = strptime(timestamp_str.c_str(), INPUT_TIMESTAMP_TEMPLATE, &timestamp_tm);
-    if (NULL == snext) {
-      return -1;
+    std::istringstream in{timestamp_str};
+    date::sys_time<std::chrono::milliseconds> tp;
+    in >> date::parse("%Y-%m-%dT%H:%M:%S", tp);
+    if (in.fail() || in.bad()) {
+      return 0;
     }
 
-    timestamp_sec = mktime(&timestamp_tm);
-    if (-1 == timestamp_sec) {
-      return -1;
-    }
-
-    timestamp_msec  = timestamp_sec * 1000; // convert to milliseconds
-    timestamp_msec += (time_t)(atof(snext) * 1000.0f); // add milliseconds from timestamp str
+    time_t timestamp_msec = tp.time_since_epoch().count();
     return timestamp_msec;
 }
 
