@@ -5,19 +5,7 @@
  
  * @date 10/21 */
 
-#include <cstdlib>
-#include <cassert>
-#include <string>
 #include <iostream>
-#include <time.h>
-#include <sstream>
-#include <fstream>
-#include <unordered_set>
-#include <algorithm>
-#include <iterator>
-#include <memory>
-
-
 #include "detection_manager.h"
 
 using namespace std;

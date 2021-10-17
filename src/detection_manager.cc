@@ -5,11 +5,8 @@
  
  * @date 10/21 */
 
-#include <iostream>
-#include "json/json.h"
 
 #include "detection_manager.h"
-#include "generic_detector.h"
 #include "common_password_detector.h"
 #include "identical_auth_detector.h"
 

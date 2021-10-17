@@ -6,11 +6,9 @@
  */
 
 #include <iostream>
-#include <cassert>
 #include <unordered_set>
 #include <memory>
 
-#include "json/json.h"
 #include "common_password_detector.h"
 
 using namespace std;
