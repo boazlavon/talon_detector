@@ -7,20 +7,12 @@
 #ifndef __DETECTION_MANAGER_H__
 #define __DETECTION_MANAGER_H__
 
-#include <cstdlib>
-#include <string>
 #include <iostream>
-#include <time.h>
-#include <sstream>
 #include <fstream>
 #include <unordered_set>
-#include <algorithm>
-#include <iterator>
 #include <memory>
-#include <array>
 
 #include "json/json.h"
-#include "generic_detector.h"
 #include "common_password_detector.h"
 #include "identical_auth_detector.h"
 

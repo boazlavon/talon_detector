@@ -7,9 +7,6 @@
 #ifndef __COMMON_PASSWORD_DETECTOR_H__
 #define __COMMON_PASSWORD_DETECTOR_H__
 
-#include <memory>
-
-#include "json/json.h"
 #include "generic_detector.h"
 
 using namespace std;

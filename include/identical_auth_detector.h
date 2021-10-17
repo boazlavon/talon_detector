@@ -7,17 +7,9 @@
 #ifndef __IDENTICAL_AUTH_DETECTOR_H__
 #define __IDENTICAL_AUTH_DETECTOR_H__
 
-#include <memory>
-#include <ctime>
-
-#include <iostream>
-#include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <queue>
-#include <time.h>
 
-#include "json/json.h"
 #include "generic_detector.h"
 
 using namespace std;
