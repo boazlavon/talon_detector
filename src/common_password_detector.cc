@@ -17,7 +17,7 @@ using namespace std;
 
 bool 
 CommonPasswordDetector::detect(
-  Json::Value& entry
+  const Json::Value& entry
 ) {
 
   if (!entry.isMember("host")) {

@@ -12,10 +12,12 @@
 using namespace std;
 
 class GenericDetector {
+    protected:
+        string extract_password(const Json::Value& entry);
+        string extract_user(const Json::Value& entry);
+
     public:
-    	virtual bool detect(Json::Value& entry) = 0;	    
-        string extract_password(Json::Value& entry);
-        string extract_user(Json::Value& entry);
+        virtual bool detect(const Json::Value& entry) = 0;
 };
 
 #endif /* __GENERIC_DETECTOR_H__ */

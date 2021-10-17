@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <array>
 
 #include "json/json.h"
 #include "generic_detector.h"
@@ -39,16 +40,14 @@ class DetectionManager {
         shared_ptr<unordered_set<string>> common_passwords;
         string captures_json_path;
 
-        shared_ptr<IdenticalAuthDetector>  identical_auth_detector;
-        shared_ptr<CommonPasswordDetector> common_password_detector;
-        shared_ptr<GenericDetector> detectors[DETECTORS_COUNT];
-        detection_result_t detection_results[DETECTORS_COUNT] = {DETECTED_IDENTICAL_AUTH, DETECTED_COMMON_PASSWORD};
+        array<shared_ptr<GenericDetector>, DETECTORS_COUNT> detectors;
+        array<detection_result_t, DETECTORS_COUNT> detection_results = {DETECTED_IDENTICAL_AUTH, DETECTED_COMMON_PASSWORD};
 
         detection_result_t add_capture(Json::Value entry);
 
     public:
-        DetectionManager(string secured_hosts_path, string common_passwords_path, string captures_json);
-        void execute(void);
+        DetectionManager(const string& secured_hosts_path, const string& common_passwords_path, const string& captures_json);
+        void execute();
 };
 
 #endif /* __DETECTION_MANAGER_H__ */

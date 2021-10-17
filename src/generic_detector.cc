@@ -20,8 +20,8 @@ using namespace std;
 static 
 string
 extract_content_entry(
-    Json::Value& entry,
-    string entry_regex
+    const Json::Value& entry,
+    const string& entry_regex
 ) {
     string result = "";
     smatch match;
@@ -46,14 +46,14 @@ extract_content_entry(
 
 string 
 GenericDetector::extract_password(    
-    Json::Value& entry
+    const Json::Value& entry
 ) {
     return extract_content_entry(entry, PASSWORD_REGEX);
 }
 
 string 
 GenericDetector::extract_user(    
-    Json::Value& entry
+    const Json::Value& entry
 ) {
     return extract_content_entry(entry, USER_REGEX);
 }

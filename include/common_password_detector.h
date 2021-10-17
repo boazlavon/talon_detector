@@ -24,7 +24,7 @@ class CommonPasswordDetector : public GenericDetector {
 			shared_ptr<unordered_set<string>> common_passwords
 		) : secured_hosts(secured_hosts), common_passwords(common_passwords) {}
 
-    	virtual bool detect(Json::Value& entry);
+    	virtual bool detect(const Json::Value& entry);
 };
 
 #endif /* __COMMON_PASSWORD_DETECTOR_H__ */

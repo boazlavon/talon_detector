@@ -18,7 +18,7 @@ using namespace std;
 static
 void 
 validate_captures_json(
-  string captures_json_path
+  const string& captures_json_path
 ) {
 
   Json::Value root;
@@ -52,7 +52,7 @@ validate_captures_json(
 static
 void
 init_string_set_from_file(
-  string strings_path,
+  const string& strings_path,
   shared_ptr<unordered_set<string>>& strings_set
 ) {
 
@@ -75,9 +75,9 @@ init_string_set_from_file(
 
 
 DetectionManager::DetectionManager(
-  string secured_hosts_path, 
-  string common_passwords_path,
-  string captures_json_path
+  const string& secured_hosts_path, 
+  const string& common_passwords_path,
+  const string& captures_json_path
 ) {
 
 #ifdef DEBUG
@@ -99,27 +99,26 @@ DetectionManager::DetectionManager(
 
   /* init detectors */
   this->captures_json_path = string(captures_json_path);
-  this->identical_auth_detector  = make_shared<IdenticalAuthDetector>();
-  this->detectors[0] = dynamic_pointer_cast<GenericDetector>(this->identical_auth_detector);
+  shared_ptr<IdenticalAuthDetector> identical_auth_detector  = make_shared<IdenticalAuthDetector>();
+  this->detectors[0] = dynamic_pointer_cast<GenericDetector>(identical_auth_detector);
 
-  this->common_password_detector = make_shared<CommonPasswordDetector>(secured_hosts, common_passwords);
-  this->detectors[1] = dynamic_pointer_cast<GenericDetector>(this->common_password_detector);
+  shared_ptr<CommonPasswordDetector> common_password_detector = make_shared<CommonPasswordDetector>(secured_hosts, common_passwords);
+  this->detectors[1] = dynamic_pointer_cast<GenericDetector>(common_password_detector);
 }
 
 detection_result_t 
 DetectionManager::add_capture(
-  Json::Value entry
+  const Json::Value entry
 ) {
 
   int final_detection_result = NO_DETECTION;
   bool detection_result = false;
 
-  for (size_t i = 0; i < DETECTORS_COUNT; ++i) {
+  for (size_t i = 0; i < this->detectors.size(); ++i) {
     try {
       detection_result = this->detectors[i]->detect(entry);
     }
     catch (...) {
-      cerr << "Error: Catched Exception";
       detection_result = false;
     }
 
@@ -132,7 +131,7 @@ DetectionManager::add_capture(
 }
 
 void
-DetectionManager::execute(void) {
+DetectionManager::execute() {
 
   Json::Value root;
   Json::Value entry;

@@ -16,7 +16,6 @@
 #include <chrono>
 
 #include "json/json.h"
-
 #include "identical_auth_detector.h"
 
 using namespace std;
@@ -24,7 +23,7 @@ using namespace std;
 static
 time_t
 convert_timestamp_str_to_msec(
-  string timestamp_str
+  const string& timestamp_str
 ) {    
 
     tm timestamp_tm = {};
@@ -40,16 +39,16 @@ convert_timestamp_str_to_msec(
     }
 
     timestamp_msec  = timestamp_sec * 1000; // convert to milliseconds
-    timestamp_msec += (time_t)(atof(snext) * 1000.0f);  // add milliseconds from timestamp str
+    timestamp_msec += (time_t)(atof(snext) * 1000.0f); // add milliseconds from timestamp str
     return timestamp_msec;
 }
 
 static 
 void
-find_other_host(
+find_different_host(
   shared_ptr<hosts_map_t> hosts_map,
   string new_request_host,
-  shared_ptr<RequestEntry>& other_host_request
+  shared_ptr<RequestEntry>& different_host_request
 ) {
 
   /* There is not specific requirment of which host to choose in case there is more than one different host.
@@ -58,7 +57,7 @@ find_other_host(
   hosts_map_t::iterator iter = hosts_map->begin();
   while (hosts_map->size() && iter != hosts_map->end()) {
     if (iter->first != new_request_host) {
-      other_host_request = iter->second->front();
+      different_host_request = iter->second->front();
       break;
     }
     iter++;
@@ -69,7 +68,7 @@ find_other_host(
 void
 IdenticalAuthDetector::clean_queue(
   shared_ptr<requests_queue_t> requests_queue,
-  time_t current_time_msec
+  const time_t current_time_msec
 ) {
 
   shared_ptr<RequestEntry> iter = nullptr;
@@ -90,7 +89,7 @@ IdenticalAuthDetector::clean_queue(
 void
 IdenticalAuthDetector::clean_host_queues(
   shared_ptr<hosts_map_t> hosts_map,
-  time_t current_time_msec
+  const time_t current_time_msec
 ) {
 
   shared_ptr<requests_queue_t> requests_queue = nullptr;
@@ -105,17 +104,16 @@ IdenticalAuthDetector::clean_host_queues(
       /* if there are not more requests under this host, remove the host from the hosts map */
       if (!requests_queue->size()) {
         iter = hosts_map->erase(iter);
-        continue;
-      } 
-
-      iter++;
+      } else {
+        iter++;
+      }
   }
 }
 
 
 bool 
 IdenticalAuthDetector::detect(
-  Json::Value& entry
+  const Json::Value& entry
 ) {
 
   /* Extract Propertires */
@@ -149,7 +147,7 @@ IdenticalAuthDetector::detect(
   shared_ptr<hosts_map_t> hosts_map = search_host_map->second;
   this->clean_host_queues(hosts_map, timestamp_msec);
 
-  /* add a new request */
+  /* add a new request - search the host queue or create it */
   auto search_host_queue = hosts_map->find(host);
   if (search_host_queue == hosts_map->end()) {
     hosts_map->insert({host, make_shared<requests_queue_t>()});
@@ -164,7 +162,6 @@ IdenticalAuthDetector::detect(
   cout << auth << "\n";
   shared_ptr<RequestEntry> iter_requests = nullptr;
   for (auto& iter_hosts: (*hosts_map)) {
-      // clean queue
       cout << "\t" << iter_hosts.first << "\n";
       auto s = iter_hosts.second->size();
       for (int i = 0; i < (int)s; ++i) {
@@ -177,15 +174,18 @@ IdenticalAuthDetector::detect(
   cout << "\n";
 #endif
 
+  /* If there is a different host for with this auth (user&password) - it's in the detection window.
+     Therefore, print detection details */
   if (hosts_map->size() > 1) {
-    shared_ptr<RequestEntry> other_host_request = nullptr;
-    find_other_host(hosts_map, request->get_host(), other_host_request);
-    if (nullptr != other_host_request) {
-      time_t diff_msec = request->get_timestamp_msec() - other_host_request->get_timestamp_msec();
+    shared_ptr<RequestEntry> different_host_request = nullptr;
+    find_different_host(hosts_map, request->get_host(), different_host_request);
+    if (nullptr != different_host_request) {
+      time_t diff_msec = request->get_timestamp_msec() - different_host_request->get_timestamp_msec();
       cout << "Identical User/Password pair found diff under " << (this->max_gap_msec / 1000) << "s" << ": " << diff_msec << "ms in host " << host << " user/pass: " << user << "/" << password << "\n";
     } else {
-      cout << "Error\n";
+      cerr << "Identical Auth Detector: Error\n";
     }
   }
+
   return (hosts_map->size() > 1); 
 }
