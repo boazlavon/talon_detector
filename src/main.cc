@@ -25,7 +25,7 @@ using namespace std;
 enum argv_params_e {
 
   ARGV_PNAME              = 0,
-  ARGV_SECURED_HOSTS_PATH  = 1,
+  ARGV_SECURED_HOSTS_PATH = 1,
   ARGV_PASSWORDS_PATH     = 2,
   ARGV_JSON_CAPTURES      = 3,
 
