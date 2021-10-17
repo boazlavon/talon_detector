@@ -134,15 +134,15 @@ void
 DetectionManager::execute() {
 
   Json::Value root;
-  Json::Value entry;
   detection_result_t detection_result;
+  size_t i = 0;
 
   ifstream json_file(this->captures_json_path);
   json_file >> root;
 
-  for (Json::Value::ArrayIndex i = 0; i < root["requests"].size(); i++) {
-      entry = root["requests"][i];
+  for (Json::Value& entry : root["requests"]) {
       detection_result = add_capture(entry);
       cout << (int)i << ")\t" << "ts: " << entry["timestamp"].asString() << "\tresult: " << (int)detection_result << "\n";
+      i++;
   }
 }

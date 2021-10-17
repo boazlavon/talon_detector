@@ -27,11 +27,12 @@
 using namespace std;
 
 #define DETECTORS_COUNT (2)
-typedef enum detection_result_e {
+using detection_result_t = enum detection_result_e : int {
+
     NO_DETECTION     = 0b00,
     DETECTED_IDENTICAL_AUTH   = 0b01,
     DETECTED_COMMON_PASSWORD  = 0b10
-} detection_result_t;
+};
 
 class DetectionManager {
 
