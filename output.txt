@@ -1,0 +1,19 @@
+user@ubuntu:~/talon_detector$ ./detector input_files/secure-sites.txt input_files/passwords.txt input_files/input.json
+Common password found: qwerty on secure host www.talon-sec.com
+0)	ts: 2021-11-12T19:12:14.505Z	result: 2
+Identical User/Password pair found diff under 10s: 2000ms in host www.nottalon-sec.com user/pass: root/qwerty
+1)	ts: 2021-11-12T19:12:16.505Z	result: 1
+2)	ts: 2021-11-12T19:12:16.506Z	result: 0
+3)	ts: 2021-11-12T19:12:18.505Z	result: 0
+Identical User/Password pair found diff under 10s: 5374ms in host www.nottalon-sec.com user/pass: root/qwerty
+4)	ts: 2021-11-12T19:12:19.879Z	result: 1
+5)	ts: 2021-11-12T19:12:20.000Z	result: 0
+6)	ts: 2021-11-12T19:12:30.001Z	result: 0
+Identical User/Password pair found diff under 10s: 9998ms in host www.my-web.com user/pass: admin/admin
+7)	ts: 2021-11-12T19:12:39.999Z	result: 1
+Identical User/Password pair found diff under 10s: 124ms in host www.not-my-web.com user/pass: admin/admin
+8)	ts: 2021-11-12T19:12:40.123Z	result: 1
+9)	ts: 2021-11-12T19:12:50.000Z	result: 0
+Identical User/Password pair found diff under 10s: 1000ms in host www.talon-sec.com user/pass: admin/admin
+Common password found: admin on secure host www.talon-sec.com
+10)	ts: 2021-11-12T19:12:51.000Z	result: 3
