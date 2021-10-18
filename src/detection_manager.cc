@@ -103,12 +103,12 @@ DetectionManager::DetectionManager(
   this->detectors[1] = dynamic_pointer_cast<GenericDetector>(common_password_detector);
 }
 
-detection_result_t 
+detection_result_e
 DetectionManager::add_capture(
   const Json::Value entry
 ) {
 
-  int final_detection_result = NO_DETECTION;
+  int final_detection_result = (int)detection_result_e::NO_DETECTION;
   bool detection_result = false;
 
   for (size_t i = 0; i < this->detectors.size(); ++i) {
@@ -120,18 +120,18 @@ DetectionManager::add_capture(
     }
 
     if (detection_result) {
-      final_detection_result |= this->detection_results[i];
+      final_detection_result |= (int)this->detection_results[i];
     }
   }
 
-  return (detection_result_t)final_detection_result;
+  return (detection_result_e)final_detection_result;
 }
 
 void
 DetectionManager::execute() {
 
   Json::Value root;
-  detection_result_t detection_result;
+  detection_result_e detection_result;
   size_t i = 0;
 
   ifstream json_file(this->captures_json_path);

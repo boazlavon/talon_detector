@@ -18,6 +18,7 @@ class GenericDetector {
 
     public:
         virtual bool detect(const Json::Value& entry) = 0;
+        virtual ~GenericDetector() {}
 };
 
 #endif /* __GENERIC_DETECTOR_H__ */
