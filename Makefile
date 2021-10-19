@@ -5,7 +5,7 @@ SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = $(BUILD_PATH)/bin
 JSONCPP_PATH = input_files/jsoncpp-1.8.4
-DATE_PATH = input_files/date_build
+DATE_PATH = input_files/date
 JSONCPP_LIB_PATH = $(JSONCPP_PATH)/src/lib_json
 DATE_LIB_PATH = $(DATE_PATH)/build
 
