@@ -39,10 +39,11 @@ int main(
     return (int)result_e::ERROR_INPUT_PARAMS;
   }
 
+  string secured_hosts_path(argv[(int)argv_params_e::ARGV_SECURED_HOSTS_PATH]);
+  string common_passwords_path(argv[(int)argv_params_e::ARGV_PASSWORDS_PATH]);
+  string json_captures_path(argv[(int)argv_params_e::ARGV_JSON_CAPTURES]);
+
   try {
-    string secured_hosts_path(argv[(int)argv_params_e::ARGV_SECURED_HOSTS_PATH]);
-    string common_passwords_path(argv[(int)argv_params_e::ARGV_PASSWORDS_PATH]);
-    string json_captures_path(argv[(int)argv_params_e::ARGV_JSON_CAPTURES]);
     DetectionManager manager(secured_hosts_path, common_passwords_path, json_captures_path);
     manager.execute();
   } catch (...) {
